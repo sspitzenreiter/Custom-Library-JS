@@ -59,33 +59,45 @@ class QBuilder {
       return this;
     }
   
-    join=(table, param, type)=>{
-      if(typeof this.query.join === 'undefined'){
-        this.query.join = "";
-      }else{
-        this.query.join += " ";
-      }
-      if(typeof type !== 'undefined'){
-        switch(type){
-          case "inner":
-            this.query.join+="INNER JOIN "+table+" ON "+param;
-          break;
-          case "outer":
-            this.query.join+="OUTER JOIN "+table+" ON "+param;
-          break;
-          case "left":
-            this.query.join+="LEFT JOIN "+table+" ON "+param;
-          break;
-          case "right":
-            this.query.join+="RIGHT JOIN "+table+" ON "+param;
-          break;
-          case "full":
-            this.query.join+="FULL JOIN "+table+" ON "+param;
-          break;
+    join=(tabler, params, typer)=>{
+      const funct_table = (table, param, type) =>{
+        if(typeof this.query.join === 'undefined'){
+          this.query.join = "";
+        }else{
+          this.query.join += " ";
         }
-      }else{
-        this.query.join+="INNER JOIN "+table+" ON "+param;
+        if(typeof type !== 'undefined'){
+          switch(type){
+            case "inner":
+              this.query.join+="INNER JOIN "+table+" ON "+param;
+            break;
+            case "outer":
+              this.query.join+="OUTER JOIN "+table+" ON "+param;
+            break;
+            case "left":
+              this.query.join+="LEFT JOIN "+table+" ON "+param;
+            break;
+            case "right":
+              this.query.join+="RIGHT JOIN "+table+" ON "+param;
+            break;
+            case "full":
+              this.query.join+="FULL JOIN "+table+" ON "+param;
+            break;
+          }
+        }else{
+          this.query.join+="INNER JOIN "+table+" ON "+param;
+        }
       }
+      if(Array.isArray(tabler)){
+        tabler.map(x=>{
+          funct_table(x.table, x.param, x.type);
+        })
+      }else if(typeof tabler === 'object'){
+        funct_table(tabler.table, tabler.param, tabler.type);
+      }else{
+        funct_table(tabler, params, typer);
+      }
+      
       return this;
     }
   
@@ -103,7 +115,7 @@ class QBuilder {
         this.query.order_by="order by "+param;
       }
     }
-  
+
     limit=(limit, offset)=>{
       if(typeof offset !== 'undefined'){
         this.query.limit="limit "+limit+" offset "+offset;
